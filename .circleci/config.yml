@@ -28,6 +28,7 @@ jobs:
               docker push breszdev/example-nodejs-circle:${CIRCLE_SHA1}
             else
               echo "This is ${CIRCLE_BRANCH}"
+            fi
       - run:
         name: "Call to rancher to deploy"
         command: |
