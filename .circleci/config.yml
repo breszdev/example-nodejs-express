@@ -21,21 +21,23 @@ jobs:
       - run:
           name: "Build docker image and push to docker hub"
           command: |
-            cp Dockerfile.production Dockerfile
-            docker build -t breszdev/example-nodejs-circle:latest .
-            docker build -t breszdev/example-nodejs-circle:${CIRCLE_SHA1} .
-            docker push breszdev/example-nodejs-circle:latest
-            docker push breszdev/example-nodejs-circle:${CIRCLE_SHA1}
+            if [ "${CIRCLE_BRANCH}" == "develop" ]; then
+              docker build -t breszdev/example-nodejs-circle:latest .
+              docker build -t breszdev/example-nodejs-circle:${CIRCLE_SHA1} .
+              docker push breszdev/example-nodejs-circle:latest
+              docker push breszdev/example-nodejs-circle:${CIRCLE_SHA1}
+            else
+              echo "This is ${CIRCLE_BRANCH}"
       - run:
-          name: "Call to rancher to deploy"
-          command: |
-            docker run --rm -it \
-              -e CATTLE_ACCESS_KEY="$CATTLE_ACCESS_KEY" \
-              -e CATTLE_SECRET_KEY="$CATTLE_SECRET_KEY" \
-              -e CATTLE_URL="$CATTLE_URL" \
-              etlweather/gaucho upgrade $RANCHER_EXAMPLE_NAME_NODEJS \
-              --imageUuid 'docker:breszdev/example-nodejs-circle:latest' \
-              --batch_size 3 --start_first \
-              --auto_complete --timeout 600 \
-              /
-      - run: echo Done
+        name: "Call to rancher to deploy"
+        command: |
+          docker run --rm -it \
+            -e CATTLE_ACCESS_KEY="$CATTLE_ACCESS_KEY" \
+            -e CATTLE_SECRET_KEY="$CATTLE_SECRET_KEY" \
+            -e CATTLE_URL="$CATTLE_URL" \
+            etlweather/gaucho upgrade $RANCHER_EXAMPLE_NAME_NODEJS \
+            --imageUuid 'docker:breszdev/example-nodejs-circle:latest' \
+            --batch_size 3 --start_first \
+            --auto_complete --timeout 600 \
+            /
+      - run: echo Complete
