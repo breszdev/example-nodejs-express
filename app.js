@@ -10,6 +10,15 @@ var users = require('./routes/users');
 
 var app = express();
 
+var apm = require('elastic-apm-node').start({
+  // Set required service name (allowed characters: a-z, A-Z, 0-9, -, _, and space)
+  serviceName: 'Frontend',
+  // Use if APM Server requires a token
+  secretToken: '',
+  // Set custom APM Server URL (default: http://localhost:8200)
+  serverUrl: 'http://apmna:8200'
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
